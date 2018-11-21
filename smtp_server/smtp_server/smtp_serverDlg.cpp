@@ -60,6 +60,8 @@ Csmtp_serverDlg::Csmtp_serverDlg(CWnd* pParent /*=NULL*/)
 void Csmtp_serverDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_Log, m_log);
+	DDX_Control(pDX, IDC_INFO, m_info);
 }
 
 BEGIN_MESSAGE_MAP(Csmtp_serverDlg, CDialogEx)
@@ -101,7 +103,26 @@ BOOL Csmtp_serverDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-
+	//CAsyncSocket MySock;
+	int bFlag = MySock.Create(25, SOCK_STREAM, FD_ACCEPT | FD_READ);
+	if (bFlag == 0)
+	{
+		m_log.SetWindowText(L"SMTP套接口建立失败\r\n");
+		MySock.Close();
+	}
+	else
+	{
+		int i = MySock.Listen(1);
+		if (i == 0)
+		{
+			m_log.SetWindowText(L"SMTP监听失败\r\n");
+			MySock.Close();
+		}
+		else
+		{
+			m_log.SetWindowText(L"SMTP服务器准备好\r\n\r\n");
+		}
+	}
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -153,4 +174,3 @@ HCURSOR Csmtp_serverDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }
-

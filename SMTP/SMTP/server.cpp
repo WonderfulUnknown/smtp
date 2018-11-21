@@ -39,7 +39,7 @@ int main()
 	sin.sin_addr.S_un.S_addr = INADDR_ANY;
 	//sin.sin_addr.s_addr = inet_addr("127.0.0.1");
 	sin.sin_family = AF_INET;
-	sin.sin_port = htons(5001);//5001~65535
+	sin.sin_port = htons(25);//5001~65535
 
     //绑定套接字到一个IP地址和一个端口上bind()
 	if(bind(sock,(struct sockaddr*)&sin,sizeof(sin)) == SOCKET_ERROR)

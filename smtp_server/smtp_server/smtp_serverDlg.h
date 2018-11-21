@@ -3,7 +3,8 @@
 //
 
 #pragma once
-
+#include "mailsocket.h"
+#include "afxwin.h"
 
 // Csmtp_serverDlg ¶Ô»°¿ò
 class Csmtp_serverDlg : public CDialogEx
@@ -31,4 +32,9 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	//CStatic m_Bmp;
+	mailsocket MySock;
+	CEdit m_log;
+	CEdit m_info;
 };

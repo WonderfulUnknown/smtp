@@ -23,8 +23,10 @@ int main()
 
 		sockaddr_in serAddr;
 		serAddr.sin_family = AF_INET;
-		serAddr.sin_port = htons(5001);
+		//serAddr.sin_port = htons(5001);
+		serAddr.sin_port = htons(25);
 		serAddr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+		//serAddr.sin_addr.S_un.S_addr = inet_addr("196.128.100.99");
 		if (connect(sclient, (sockaddr *)&serAddr, sizeof(serAddr)) == SOCKET_ERROR)
 		{  //连接失败 
 			printf("connect error !");
@@ -36,7 +38,7 @@ int main()
 		//int send(int s, const void * msg, int len, unsigned int flags)
 		//s为已建立好连接的socket，msg指向数据内容，len则为数据长度，参数flags一般设0
 		//成功则返回实际传送出去的字符数，失败返回-1，错误原因存于error 
-
+		printf("connect succeed !");
 		char recData[255];
 		char data[100];
 		while (true)

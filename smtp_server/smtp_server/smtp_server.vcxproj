@@ -189,6 +189,8 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="base.h" />
+    <ClInclude Include="mailsocket.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="smtp_server.h" />
     <ClInclude Include="smtp_serverDlg.h" />
@@ -196,6 +198,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="mailsocket.cpp" />
     <ClCompile Include="smtp_server.cpp" />
     <ClCompile Include="smtp_serverDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -217,4 +220,9 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="smtp_server.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
