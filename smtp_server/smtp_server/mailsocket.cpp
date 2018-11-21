@@ -82,7 +82,7 @@ void mailsocket::OnReceive(int nErrorCode)
 		if (!IsData)//如果接收到的是命令
 		{
 			//分别对不同命令进行应答
-			if (receive.Left(4) == "helo" || receive.Left(4) == "HELO")
+			if (receive.Left(4) == "ehlo" || receive.Left(4) == "helo")
 			{
 				char* send = "250 OK 127.0.0.1\r\n";//应答
 
@@ -92,17 +92,7 @@ void mailsocket::OnReceive(int nErrorCode)
 				AfxGetMainWnd()->SetDlgItemText(IDC_Log, Log);//写发送日志
 				return;
 			}
-			//if (receive.Left(4) == "EHLO")
-			//{
-			//	char* send = "250 OK 127.0.0.1\r\n";//应答
-
-			//	Send(send, strlen(send), 0);//发送应答
-			//	Log = Log + L"S:" + L"127.0.0.1\r\n";
-			//	AsyncSelect(FD_READ);//触发接收函数
-			//	AfxGetMainWnd()->SetDlgItemText(IDC_Log, Log);//写发送日志
-			//	return;
-			//}
-			if (receive.Left(10) == "MAIL FROM:")
+			if (receive.Left(10) == "mail from:")
 			{
 				char *send = "250 Sender OK\r\n";
 
@@ -112,7 +102,7 @@ void mailsocket::OnReceive(int nErrorCode)
 				AfxGetMainWnd()->SetDlgItemText(IDC_Log, Log);
 				return;
 			}
-			if (receive.Left(8) == "RCPT TO:")
+			if (receive.Left(8) == "rcpt to:")
 			{
 				char* send = "250 Receiver OK\r\n";
 
@@ -122,7 +112,7 @@ void mailsocket::OnReceive(int nErrorCode)
 				AfxGetMainWnd()->SetDlgItemText(IDC_Log, Log);
 				return;
 			}
-			if (receive.Left(4) == "DATA")
+			if (receive.Left(4) == "data")
 			{
 				IsData = true;//如果收到DATA命令，说明接下来的接收到的是数据
 				char* send = "354 Go ahead\r\n";
