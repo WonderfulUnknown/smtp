@@ -22,5 +22,10 @@ public:
 	bool Quit;
 	bool IsBmp;
 	CString pic;
-	char data[BufferLen];
+
+	char data[BufferLen];//接受数据的缓冲区
+	char* send;//每次发送的数据
+	//CString Log;//每次往交互日志中写的内容
+	int length;//每次返回数据的长度
+	CString receive;//存放从缓冲区中取出来的数据
 };

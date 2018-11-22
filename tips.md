@@ -1,0 +1,1 @@
+CSocket类的函数工作在阻塞的模式，一旦调用send()，所有数据发送前，程序和线程都被阻塞。一般将CSocket与CArchive和CSocketFile结合，用来发送和接受数据。

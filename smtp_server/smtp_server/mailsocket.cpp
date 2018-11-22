@@ -23,28 +23,30 @@ mailsocket::~mailsocket()
 
 // mailsocket 成员函数
 
-
+//参数nErrorCode,函数调用时，MFC框架提供，表明套接字最新的状态
+//如果是0，函数正常执行，没有错误；非0，套接字对象出错
 void mailsocket::OnAccept(int nErrorCode)
 {
 	// TODO: 在此添加专用代码和/或调用基类
-
-	CString PreLog, Log;
-	AfxGetMainWnd()->GetDlgItemText(IDC_Log, PreLog);
+	Csmtp_serverDlg* dlg = (Csmtp_serverDlg*)AfxGetApp()->GetMainWnd(); //获得主窗口指针对象
+	CString Log, PreLog;
 	Log += PreLog;
 	mailsocket *NewSock = new mailsocket();
-
-	int IsConnect = Accept(*NewSock);
-	if (IsConnect != 0)
+	AfxGetMainWnd()->GetDlgItemText(IDC_Log, PreLog);
+	if (Accept(*NewSock))
 	{
-		char* send = "1611305 SMTP is ready \r\n";
+		send = "1611305 SMTP is ok \r\n";
 		NewSock->Send(send, strlen(send), 0);
-		NewSock->AsyncSelect(FD_READ);//调用接受函数进行操作。
+		//触发FD_READb 事件，调用OnReceive函数
+		NewSock->AsyncSelect(FD_READ);
+		dlg->m_log.AddString(L"TCP连接成功");
 		Log += "TCP连接成功\r\n";
 	}
 	else
 	{
+		dlg->m_log.AddString(L"TCP连接失败");
 		Log += "TCP连接失败\r\n";
-
+		NewSock->Close();
 	}
 	AfxGetMainWnd()->SetDlgItemText(IDC_Log, Log);
 	CAsyncSocket::OnAccept(nErrorCode);
@@ -62,11 +64,19 @@ void mailsocket::OnClose(int nErrorCode)
 void mailsocket::OnReceive(int nErrorCode)
 {
 	// TODO: 在此添加专用代码和/或调用基类
+	Csmtp_serverDlg* dlg = (Csmtp_serverDlg*)AfxGetApp()->GetMainWnd(); //获得主窗口指针对象
 
-	int length = Receive(data, sizeof(data), 0);//接收到的数据存到data
-	CString receive;
-	receive += data;
-	CString PreLog, Log;
+	memset(data, 0, sizeof(data));  //每次receive的之前需要把缓冲区清零
+	length = Receive(data, sizeof(data), 0);//返回收到消息的长度，接收到的数据存到data中
+
+	//将数据从等待队列读入缓存区，并且不将数据从缓冲区清除
+	//length = Receive(data, sizeof(data), MSG_PEEK);
+	//接受外带数据
+	//length = Receive(data, sizeof(data), MSG_OOB);
+
+	//receive.Format(_T("%s"), data);
+	receive = data;
+	CString PreLog,Log;
 	AfxGetMainWnd()->GetDlgItemText(IDC_Log, PreLog);
 	if (!IsData)//写接收日志
 	{
@@ -77,24 +87,25 @@ void mailsocket::OnReceive(int nErrorCode)
 		Log = PreLog + L"C:" + L"data" + L"\r\n";
 	}
 
-	if (length != 0)//如果接收到数据
+	//if (length != 0)//如果接收到数据
+	if (length != SOCKET_ERROR)
 	{
 		if (!IsData)//如果接收到的是命令
 		{
 			//分别对不同命令进行应答
 			if (receive.Left(4) == "ehlo" || receive.Left(4) == "helo")
 			{
-				char* send = "250 OK 127.0.0.1\r\n";//应答
-
+				send = "250 OK 127.0.0.1\r\n";//应答
 				Send(send, strlen(send), 0);//发送应答
 				Log = Log + L"S:" + L"127.0.0.1\r\n";
+				dlg->m_log.AddString(L"S:127.0.0.1");
 				AsyncSelect(FD_READ);//触发接收函数
 				AfxGetMainWnd()->SetDlgItemText(IDC_Log, Log);//写发送日志
 				return;
 			}
 			if (receive.Left(10) == "mail from:")
 			{
-				char *send = "250 Sender OK\r\n";
+				send = "250 Sender OK\r\n";
 
 				Send(send, strlen(send), 0);
 				Log = Log + L"S:" + L"250 Sender OK\r\n";
@@ -104,7 +115,7 @@ void mailsocket::OnReceive(int nErrorCode)
 			}
 			if (receive.Left(8) == "rcpt to:")
 			{
-				char* send = "250 Receiver OK\r\n";
+				send = "250 Receiver OK\r\n";
 
 				Send(send, strlen(send), 0);
 				Log = Log + L"S:" + L"250 Receiver OK\r\n";
@@ -115,7 +126,7 @@ void mailsocket::OnReceive(int nErrorCode)
 			if (receive.Left(4) == "data")
 			{
 				IsData = true;//如果收到DATA命令，说明接下来的接收到的是数据
-				char* send = "354 Go ahead\r\n";
+				send = "354 Go ahead\r\n";
 
 				Send(send, strlen(send), 0);
 
@@ -126,7 +137,7 @@ void mailsocket::OnReceive(int nErrorCode)
 			}
 			if (receive.Left(4) == "QUIT" || receive.Left(4) == "RSET")
 			{
-				char* send = "221 Quit,Goodbye\r\n";
+				send = "221 Quit,Goodbye\r\n";
 
 				Send(send, strlen(send), 0);
 				Log = Log + "S:" + (CString)send;
@@ -135,7 +146,7 @@ void mailsocket::OnReceive(int nErrorCode)
 				AfxGetMainWnd()->SetDlgItemText(IDC_Log, Log);
 				return;
 			}
-			char* send = "500 order is wrong\r\n";
+			send = "500 order is wrong\r\n";
 
 			Send(send, strlen(send), 0);
 			Log = Log + "S:" + (CString)send;
@@ -152,7 +163,7 @@ void mailsocket::OnReceive(int nErrorCode)
 			if (receive.Find(L"\r\n.\r\n") != -1)//数据接收完成
 			{
 				IsData = false;
-				char* send;
+				send;
 				send = "250 Message accepted for delivery\r\n";//发送应答
 
 				Send(send, strlen(send), 0);

@@ -5,6 +5,7 @@
 #pragma once
 #include "mailsocket.h"
 #include "afxwin.h"
+#include "afxcmn.h"
 
 // Csmtp_serverDlg ¶Ô»°¿ò
 class Csmtp_serverDlg : public CDialogEx
@@ -35,6 +36,9 @@ protected:
 public:
 	//CStatic m_Bmp;
 	mailsocket MySock;
-	CEdit m_log;
+//	CEdit m_log;
 	CEdit m_info;
+//	CListCtrl log;
+//	CString log;
+	CListBox m_log;
 };

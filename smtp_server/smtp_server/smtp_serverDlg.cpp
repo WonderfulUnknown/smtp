@@ -52,6 +52,7 @@ END_MESSAGE_MAP()
 
 Csmtp_serverDlg::Csmtp_serverDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_SMTP_SERVER_DIALOG, pParent)
+	//, log(_T(""))
 {
 	EnableActiveAccessibility();
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -60,8 +61,9 @@ Csmtp_serverDlg::Csmtp_serverDlg(CWnd* pParent /*=NULL*/)
 void Csmtp_serverDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_Log, m_log);
+	//  DDX_Control(pDX, IDC_Log, m_log);
 	DDX_Control(pDX, IDC_INFO, m_info);
+	DDX_Control(pDX, IDC_LIST4, m_log);
 }
 
 BEGIN_MESSAGE_MAP(Csmtp_serverDlg, CDialogEx)
@@ -103,24 +105,27 @@ BOOL Csmtp_serverDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-	//CAsyncSocket MySock;
-	int bFlag = MySock.Create(25, SOCK_STREAM, FD_ACCEPT | FD_READ);
-	if (bFlag == 0)
+	//创建底层套接字句柄
+	int bFlag = MySock.Create(25, SOCK_STREAM, FD_ACCEPT);//, (LPCTSTR)"127.0.0.1"
+	if (!bFlag)
 	{
-		m_log.SetWindowText(L"SMTP套接口建立失败\r\n");
+		m_log.SetWindowText(L"创建Socket失败\r\n");
+		AfxMessageBox(_T("创建Socket失败!"));
 		MySock.Close();
 	}
 	else
 	{
-		int i = MySock.Listen(1);
-		if (i == 0)
+		//指定监听套接字对象等待队列最大请求个数
+		if (!MySock.Listen(5))
 		{
-			m_log.SetWindowText(L"SMTP监听失败\r\n");
+			m_log.SetWindowText(L"SMTP服务器监听失败\r\n");
+			AfxMessageBox(_T("SMTP服务器监听失败"));
 			MySock.Close();
 		}
+		//接受请求后，触发FD_ACCEPT事件，调用OnAccpet函数
 		else
 		{
-			m_log.SetWindowText(L"SMTP服务器准备好\r\n\r\n");
+			m_log.SetWindowText(L"SMTP服务器准备就绪\r\n");
 		}
 	}
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
