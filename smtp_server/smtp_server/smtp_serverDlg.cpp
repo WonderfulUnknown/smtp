@@ -52,7 +52,6 @@ END_MESSAGE_MAP()
 
 Csmtp_serverDlg::Csmtp_serverDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_SMTP_SERVER_DIALOG, pParent)
-	//, log(_T(""))
 {
 	EnableActiveAccessibility();
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -61,9 +60,8 @@ Csmtp_serverDlg::Csmtp_serverDlg(CWnd* pParent /*=NULL*/)
 void Csmtp_serverDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	//  DDX_Control(pDX, IDC_Log, m_log);
 	DDX_Control(pDX, IDC_INFO, m_info);
-	DDX_Control(pDX, IDC_LIST4, m_log);
+	DDX_Control(pDX, IDC_Log, m_log);
 }
 
 BEGIN_MESSAGE_MAP(Csmtp_serverDlg, CDialogEx)

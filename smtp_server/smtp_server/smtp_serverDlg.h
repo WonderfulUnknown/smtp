@@ -34,11 +34,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	//CStatic m_Bmp;
 	mailsocket MySock;
-//	CEdit m_log;
 	CEdit m_info;
-//	CListCtrl log;
-//	CString log;
-	CListBox m_log;
+	CEdit m_log;
 };
