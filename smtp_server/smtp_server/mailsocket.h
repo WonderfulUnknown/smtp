@@ -28,4 +28,5 @@ public:
 	//CString Log;//每次往交互日志中写的内容
 	int length;//每次返回数据的长度
 	CString receive;//存放从缓冲区中取出来的数据
+	int step;//检验smtp协议到第几步
 };
