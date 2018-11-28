@@ -22,5 +22,6 @@ public:
 	bool IsData;//传输的是否是数据
 	bool Quit;//是否接受到quit命令
 	bool IsBmp;//附件是否有图片
+	bool IsError;//判断命令是否有错
 };
 

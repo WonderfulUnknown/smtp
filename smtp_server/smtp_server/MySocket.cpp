@@ -3,12 +3,17 @@
 #include "smtp_server.h"
 #include "smtp_serverDlg.h"
 #include "base.h"
+#include <regex>  // regular expression 正则表达式
+
+using namespace std;
 
 MySocket::MySocket()
 {
 	step = 1;
 	IsData = false;
 	Quit = false;
+	IsBmp = false;
+	IsError = false;
 }
 
 
@@ -58,9 +63,9 @@ void MySocket::OnClose(int nErrorCode)
 void MySocket::OnReceive(int nErrorCode)
 {
 	// TODO: 在此添加专用代码和/或调用基类
-	
+
 	//每次receive之前需要把缓冲区清零
-	memset(data, 0, sizeof(data));  
+	memset(data, 0, sizeof(data));
 	//length存储返回收到消息的长度，接收到的数据存到data中
 	length = Receive(data, sizeof(data), 0);
 
@@ -82,26 +87,82 @@ void MySocket::OnReceive(int nErrorCode)
 	{
 		if (!IsData)//接收到命令
 		{
-			//根据用户输入的内容进行应答
-			if ((receive.Left(4) == "HELO" || receive.Left(4) == "EHLO") && step == 1)
-				msg = "250 OK hello smtp 127.0.0.1\r\n";
-			else if (receive.Left(10) == "MAIL FROM:" && step == 2)
-				msg = "250 Sender OK\r\n";
-			else if (receive.Left(8) == "RCPT TO:" && step == 3)
-				msg = "250 Receiver OK\r\n";
-			else if (receive.Left(4) == "DATA" && step == 4)
+			std::regex mail_pattern("([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)");
+			CString Mail;
+			string mail;
+			smatch r;
+			switch (step)
 			{
-				IsData = true;//如果收到DATA命令，说明接下来的接收到的是数据
-				msg = "354 Start mail input,end with <CRLF>.<CRLF>\r\n";
+			case 1:
+				//截取左侧n个字符，遇到双字节字符比如中文，则可能会截断乱码，n按照字节计数
+				if (receive.Left(4) == "HELO" || receive.Left(4) == "EHLO")
+					msg = "250 OK hello smtp 127.0.0.1\r\n";
+				else IsError = true;
+				break;
+			case 2:
+				if (receive.Left(10) == "MAIL FROM:")
+				{
+					Mail = receive.Mid(11);//截取邮箱
+					Mail.Remove('<');
+					Mail.Remove('>');
+					Mail.Remove('\r');
+					Mail.Remove('\n');
+					mail = CT2A(Mail.GetBuffer());//将CString转为string
+					//MessageBox(NULL,Mail, L"debug", MB_OK);
+
+					//判断整个表达式是否匹配
+					regex_match(mail, r, mail_pattern);
+					if (r.str() == mail)
+					{
+						msg = "250 Sender's mail is ok\r\n";
+						//msg = "250 Sender: ";
+						//strcat_s比strcat安全，不会溢出
+						//strcat_s(msg, 100, (char*)mail.c_str());//.c_str()将str转换为char *
+						//strcat_s(msg, 100, " OK \r\n");//sizeof(char *)=4,出错
+					}
+					else
+						msg = "550 Mailbox is not available";
+				}
+				else IsError = true;
+				break;
+			case 3:
+				if (receive.Left(8) == "RCPT TO:")
+				{
+					Mail = receive.Mid(11);//截取邮箱
+					Mail.Remove('<');
+					Mail.Remove('>');
+					Mail.Remove('\r');
+					Mail.Remove('\n');
+					mail = CT2A(Mail.GetBuffer());//将CString转为string
+					//MessageBox(NULL,Mail, L"debug", MB_OK);
+
+					//判断整个表达式是否匹配
+					regex_match(mail, r, mail_pattern);
+					if (r.str() == mail)
+						msg = "250 Receiver's mail is ok\r\n";	
+					else
+						msg = "550 Mailbox is not available";
+				}
+				else IsError = true;
+				break;
+			case 4:
+				if (receive.Left(4) == "DATA")
+				{
+					IsData = true;//如果收到DATA命令，说明接下来的接收到的是数据
+					msg = "354 Start mail input,end with <CRLF>.<CRLF>\r\n";
+				}
+				else IsError = true;
+				break;
+			default:
+				if (receive.Left(4) == "QUIT")
+				{
+					msg = "221 smtp 127.0.0.1 server closing connection\r\n";
+					Quit = true;//客户端退出命令，终止程序
+				}
 			}
-			else if (receive.Left(4) == "QUIT")
-			{
-				msg = "221 smtp 127.0.0.1 server closing connection\r\n";
-				Quit = true;//客户端退出命令，终止程序
-			}
-			else
+			if (IsError)
 				msg = "550 Error: bad syntax\r\n";
-	
+
 			Send(msg, strlen(msg), 0);//发送应答
 
 			step++;
@@ -121,15 +182,15 @@ void MySocket::OnReceive(int nErrorCode)
 			if (receive.Find(L"\r\n.\r\n") != -1)//数据接收完成
 			{
 				IsData = false;
-				
+
 				msg = "250 Message accepted\r\n";//发送应答
 				Send(msg, strlen(msg), 0);
-				
+
 				log = log + "S:" + (CString)msg;
 				AfxGetMainWnd()->SetDlgItemText(IDC_Log, log);
-				
+
 				//AfxGetMainWnd()->GetDlgItemText(IDC_INFO, pic);
-				
+
 				if (pic.Find(L"Content-Type: image/bmp") != -1)//附件中有bmp图片
 				{
 					//截取bmp图片的base64编码
@@ -160,6 +221,6 @@ void MySocket::OnReceive(int nErrorCode)
 		Quit = false;
 		return;
 	}
-	
+
 	CAsyncSocket::OnReceive(nErrorCode);
 }
