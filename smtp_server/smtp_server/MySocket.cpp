@@ -76,7 +76,7 @@ void MySocket::OnReceive(int nErrorCode)
 
 	receive = data;
 	CString log;
-	//将上一次的log写入
+	
 	AfxGetMainWnd()->GetDlgItemText(IDC_Log, log);
 	if (!IsData)
 		log = log + L"C:" + receive.Left(length);
@@ -171,7 +171,6 @@ void MySocket::OnReceive(int nErrorCode)
 			AfxGetMainWnd()->SetDlgItemText(IDC_Log, log);//写发送日志
 			return;
 		}
-		//接收完数据才应答
 		else
 		{
 			//获取邮件的所有内容
@@ -179,7 +178,8 @@ void MySocket::OnReceive(int nErrorCode)
 			AfxGetMainWnd()->SetDlgItemText(IDC_INFO, str);
 
 			//<CRLF>.<CRLF>
-			if (receive.Find(L"\r\n.\r\n") != -1)//数据接收完成
+			//如果查到，返回以0索引起始的位置;未查到，返回-1
+			if (receive.FindOneOf(L"\r\n.\r\n") != -1)
 			{
 				IsData = false;
 
@@ -189,11 +189,11 @@ void MySocket::OnReceive(int nErrorCode)
 				log = log + "S:" + (CString)msg;
 				AfxGetMainWnd()->SetDlgItemText(IDC_Log, log);
 
-				//AfxGetMainWnd()->GetDlgItemText(IDC_INFO, pic);
-
-				if (pic.Find(L"Content-Type: image/bmp") != -1)//附件中有bmp图片
+				AfxGetMainWnd()->GetDlgItemText(IDC_INFO, pic);
+				//Find如果查到，返回以0索引起始的位置;未查到,返回-1
+				if (pic.Find(L"Content-Type: image/bmp") != -1)//附件中有图片
 				{
-					//截取bmp图片的base64编码
+					//截取图片的base64编码
 					int Attachment_Start = pic.Find(L"Content-Disposition: attachment", 0);
 					int Bmp_Start = pic.Find(L"\r\n\r\n", Attachment_Start);
 					CString Start = pic.Mid(Bmp_Start + 4, pic.GetLength() - Bmp_Start - 4);
@@ -203,8 +203,8 @@ void MySocket::OnReceive(int nErrorCode)
 					//解码
 					DeCode(pic, picture);
 					//输入到对话框
-					Csmtp_serverDlg *CurrentApp = (Csmtp_serverDlg *)AfxGetApp();
-					Csmtp_serverDlg *CurrentDlg = (Csmtp_serverDlg *)CurrentApp->m_hWnd;
+					//Csmtp_serverDlg *CurrentApp = (Csmtp_serverDlg *)AfxGetApp();
+					//Csmtp_serverDlg *CurrentDlg = (Csmtp_serverDlg *)CurrentApp->m_hWnd;
 					//CurrentDlg->m_Bmp.SetBitmap(picture);
 
 				}
