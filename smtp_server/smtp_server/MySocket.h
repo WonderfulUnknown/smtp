@@ -11,7 +11,7 @@ public:
 	void OnClose(int nErrorCode);
 	void OnReceive(int nErrorCode);
 
-	char data[4096];//接受数据的缓冲区
+	char data[8192];//接受数据的缓冲区
 	char *msg;//发送的数据
 	//CString log;//每次往交互日志中写的内容
 	int length;//返回数据的长度

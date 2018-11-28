@@ -1,4 +1,9 @@
 ﻿  MySocket.cpp
 c:\users\user\documents\visual studio 2015\projects\计算机网络\smtp_server\smtp_server\base.h(39): warning C4244: “初始化”: 从“wchar_t”转换到“char”，可能丢失数据
+  正在生成代码...
+  正在编译...
+  smtp_serverDlg.cpp
+  smtp_server.cpp
+  正在生成代码...
   smtp_server.vcxproj -> C:\Users\user\Documents\Visual Studio 2015\Projects\计算机网络\smtp_server\Debug\smtp_server.exe
   smtp_server.vcxproj -> C:\Users\user\Documents\Visual Studio 2015\Projects\计算机网络\smtp_server\Debug\smtp_server.pdb (Full PDB)

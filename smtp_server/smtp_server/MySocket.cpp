@@ -173,9 +173,12 @@ void MySocket::OnReceive(int nErrorCode)
 		}
 		else
 		{
+			CString temp;
+			//保留之前写好的邮件格式等信息
+			AfxGetMainWnd()->GetDlgItemText(IDC_INFO, temp);
 			//获取邮件的所有内容
-			CString str = receive.Left(length);
-			AfxGetMainWnd()->SetDlgItemText(IDC_INFO, str);
+			pic = temp + receive.Left(length);
+			AfxGetMainWnd()->SetDlgItemText(IDC_INFO, pic);
 
 			//<CRLF>.<CRLF>
 			//如果查到，返回以0索引起始的位置;未查到，返回-1
@@ -189,7 +192,6 @@ void MySocket::OnReceive(int nErrorCode)
 				log = log + "S:" + (CString)msg;
 				AfxGetMainWnd()->SetDlgItemText(IDC_Log, log);
 
-				AfxGetMainWnd()->GetDlgItemText(IDC_INFO, pic);
 				//Find如果查到，返回以0索引起始的位置;未查到,返回-1
 				if (pic.Find(L"Content-Type: image/bmp") != -1)//附件中有图片
 				{
