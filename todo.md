@@ -19,11 +19,8 @@
 结构
 对话框
 函数
-...
-## 6.debug 
-解决cmd下telnet只能发送单字符
->放弃了
-
+## 6.对用户发送的进行检测
+对邮箱检测。。
 #done
 1.Log日志正常交换
 >未理解AfxGetMainWnd()->GetDlgItemText(IDC_Log, PreLog);

@@ -190,7 +190,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base.h" />
-    <ClInclude Include="mailsocket.h" />
+    <ClInclude Include="base64.h" />
+    <ClInclude Include="MySocket.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="smtp_server.h" />
     <ClInclude Include="smtp_serverDlg.h" />
@@ -198,7 +199,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="mailsocket.cpp" />
+    <ClCompile Include="base64.cpp" />
+    <ClCompile Include="MySocket.cpp" />
     <ClCompile Include="smtp_server.cpp" />
     <ClCompile Include="smtp_serverDlg.cpp" />
     <ClCompile Include="stdafx.cpp">

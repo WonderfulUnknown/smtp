@@ -3,7 +3,7 @@
 //
 
 #pragma once
-#include "mailsocket.h"
+#include "MySocket.h"
 #include "afxwin.h"
 #include "afxcmn.h"
 
@@ -34,7 +34,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	mailsocket MySock;
+	MySocket MySock;
 	CEdit m_info;
 	CEdit m_log;
 };
