@@ -3,6 +3,7 @@
 #include "smtp_server.h"
 #include "smtp_serverDlg.h"
 #include "base.h"
+#include "base64.h"
 #include <regex>  // regular expression 正则表达式
 
 using namespace std;
@@ -85,7 +86,7 @@ void MySocket::OnReceive(int nErrorCode)
 
 	if (length != SOCKET_ERROR)
 	{
-		if (!IsData)//接收到命令
+		if (!IsData)
 		{
 			std::regex mail_pattern("([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)");
 			CString Mail;
@@ -176,13 +177,34 @@ void MySocket::OnReceive(int nErrorCode)
 			CString temp;
 			//保留之前写好的邮件格式等信息
 			AfxGetMainWnd()->GetDlgItemText(IDC_INFO, temp);
-			//获取邮件的所有内容
-			pic = temp + receive.Left(length);
-			AfxGetMainWnd()->SetDlgItemText(IDC_INFO, pic);
+
+			//获取邮件报文 + 邮件内容base64码
+			all = temp + receive.Left(length);
+			AfxGetMainWnd()->SetDlgItemText(IDC_INFO, all);
+
+			CString content;
+			//CString.Find如果查到，返回以0索引起始的位置;未查到，返回-1
+			if (receive.Find(L"Subject"))
+			{
+				temp = receive.Mid(receive.Find(L"Subject"));
+				content = temp.Left(all.Find(L"\r\n"));
+				content += L"\r\n";
+			}
+			CString data;
+			if (receive.Find(L"Content-Type: text"))
+			{
+				receive = receive.Right(receive.GetLength() - receive.Find(L"base64"));
+				for (int i = 6; receive.GetAt(i) != '-'; i++)
+				{
+					data.AppendChar(receive.GetAt(i));
+				}
+				data = Decode_base64(data);
+			}
+			content += data;
+			AfxGetMainWnd()->SetDlgItemText(IDC_Content, content);
 
 			//<CRLF>.<CRLF>
-			//如果查到，返回以0索引起始的位置;未查到，返回-1
-			if (receive.FindOneOf(L"\r\n.\r\n") != -1)
+			if (receive.Find(L"\r\n.\r\n") != -1)
 			{
 				IsData = false;
 
@@ -193,22 +215,23 @@ void MySocket::OnReceive(int nErrorCode)
 				AfxGetMainWnd()->SetDlgItemText(IDC_Log, log);
 
 				//Find如果查到，返回以0索引起始的位置;未查到,返回-1
-				if (pic.Find(L"Content-Type: image/bmp") != -1)//附件中有图片
+				if (content.Find(L"Content-Type: image/bmp") != -1)//附件中有图片
 				{
 					//截取图片的base64编码
-					int Attachment_Start = pic.Find(L"Content-Disposition: attachment", 0);
-					int Bmp_Start = pic.Find(L"\r\n\r\n", Attachment_Start);
-					CString Start = pic.Mid(Bmp_Start + 4, pic.GetLength() - Bmp_Start - 4);
+					int attach = content.Find(L"Content-Disposition: attachment", 0);
+					int picture = content.Find(L"\r\n\r\n", attach);
+					CString Start = content.Mid(picture + 4, content.GetLength() - picture - 4);
 					int length = Start.Find(L"\r\n\r\n", 0);
-					pic = Start.Left(length);
-					HBITMAP picture;
+					content = Start.Left(length);
+					HBITMAP bmp;
 					//解码
-					DeCode(pic, picture);
+					DeCode(content, bmp);
 					//输入到对话框
-					//Csmtp_serverDlg *CurrentApp = (Csmtp_serverDlg *)AfxGetApp();
-					//Csmtp_serverDlg *CurrentDlg = (Csmtp_serverDlg *)CurrentApp->m_hWnd;
-					//CurrentDlg->m_Bmp.SetBitmap(picture);
-
+					Csmtp_serverDlg *CurrentApp = (Csmtp_serverDlg *)AfxGetApp();
+					Csmtp_serverDlg *CurrentDlg = (Csmtp_serverDlg *)CurrentApp->m_hWnd;
+					
+					//CurrentDlg->m_Bmp.SetBitmap(bmp);
+					
 				}
 			}
 			AsyncSelect(FD_READ);

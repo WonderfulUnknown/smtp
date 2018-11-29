@@ -17,7 +17,7 @@ public:
 	int length;//返回数据的长度
 	CString receive;//存放从缓冲区中取出来的数据
 	int step;//用于检验smtp协议是否按顺序
-	CString pic;//用于存储图片的base64码
+	CString all;//用于存储邮件正文的base64码
 
 	bool IsData;//传输的是否是数据
 	bool Quit;//是否接受到quit命令

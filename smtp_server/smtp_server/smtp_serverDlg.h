@@ -37,4 +37,6 @@ public:
 	MySocket MySock;
 	CEdit m_info;
 	CEdit m_log;
+	CStatic m_Bmp;
+	CString m_Content;
 };
