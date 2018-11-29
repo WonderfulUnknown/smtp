@@ -64,12 +64,14 @@ void Csmtp_serverDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_INFO, m_info);
 	DDX_Control(pDX, IDC_Log, m_log);
 	DDX_Text(pDX, IDC_Content, m_Content);
+	DDX_Control(pDX, IDC_Picture, m_picture);
 }
 
 BEGIN_MESSAGE_MAP(Csmtp_serverDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_ShowPicture, &Csmtp_serverDlg::OnBnClickedShowpicture)
 END_MESSAGE_MAP()
 
 
@@ -178,4 +180,32 @@ void Csmtp_serverDlg::OnPaint()
 HCURSOR Csmtp_serverDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
+}
+
+
+
+void Csmtp_serverDlg::OnBnClickedShowpicture()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString strFilePath = _T("1.bmp");
+	if (strFilePath == _T(""))
+	{
+		return;
+	}
+	CImage image;
+	image.Load(strFilePath);
+	CRect rectControl;                        //控件矩形对象
+	CRect rectPicture;                        //图片矩形对象
+	int x = image.GetWidth();
+	int y = image.GetHeight();
+	CWnd  *pWnd = GetDlgItem(IDC_Picture);
+	pWnd->GetClientRect(rectControl);
+	CDC *pDc = GetDlgItem(IDC_Picture)->GetDC();
+	SetStretchBltMode(pDc->m_hDC, STRETCH_HALFTONE);
+	rectPicture = CRect(rectControl.TopLeft(), CSize((int)rectControl.Width(), (int)rectControl.Height()));
+	((CStatic*)GetDlgItem(IDC_Picture))->SetBitmap(NULL);
+
+	image.Draw(pDc->m_hDC, rectPicture);                //将图片绘制到Picture控件表示的矩形区域
+	image.Destroy();
+	pWnd->ReleaseDC(pDc);
 }

@@ -39,4 +39,6 @@ public:
 	CEdit m_log;
 	CStatic m_Bmp;
 	CString m_Content;
+	CStatic m_picture;
+	afx_msg void OnBnClickedShowpicture();
 };

@@ -25,26 +25,32 @@ CString Decode_base64(CString str)
 	char byte[4], out[3], curr;
 	unsigned int num[4];//存储字符在编码表数组中的下标
 	CString result;
-
+	int step = 0;
 	int i = 0;
-	while (i < str.GetLength())//一次读入四个字符
+	CFile file;
+	if (file.Open(L"1.bmp", CFile::modeWrite | CFile::modeCreate))
 	{
-		curr = str.GetAt(i);
-		if (curr != '\r' && curr != '\n')
+		while (i < str.GetLength())//一次读入四个字符
 		{
-			for (int j = 0; j < 4; j++)
+			curr = str.GetAt(i);
+			if (curr != '\r' && curr != '\n')
 			{
-				byte[j] = curr;
-
-				if (j == 3)
+				switch (step)
 				{
-					//  字符串      a       b        c
-					//	ASCII      97      98       99
-					//	8bit   01100001 01100010 01100011
-					//	6bit   011000   010110   001001   100011
-					//	十进制      24      22        9        35
-					//	对应编码    Y        W        J        j
-
+				case 0:
+					byte[0] = curr;
+					step++;
+					break;
+				case 1:
+					byte[1] = curr;
+					step++;
+					break;
+				case 2:
+					byte[2] = curr;
+					step++;
+					break;
+				case 3:
+					byte[3] = curr;
 					num[0] = DecodeTable[(int)byte[0]];
 					num[1] = DecodeTable[(int)byte[1]];
 					num[2] = DecodeTable[(int)byte[2]];
@@ -54,6 +60,9 @@ CString Decode_base64(CString str)
 					out[1] = (char)((num[1] << 4) + (num[2] >> 2));
 					out[2] = (char)((num[2] << 6) + num[3]);
 
+					file.Write(out, 3);
+					file.SeekToEnd();
+
 					result.AppendChar(out[0]);
 
 					if (byte[2] != '=')
@@ -62,11 +71,42 @@ CString Decode_base64(CString str)
 						if (byte[3] != '=')
 							result.AppendChar(out[2]);
 					}
-					//j = 0;
+					step = 0;
+					break;
 				}
 			}
+			i++;
 		}
-		i++;
 	}
+	file.Close();
 	return result;
 }
+//for (int j = 0; j < 4; j++)
+//{
+//	byte[j] = curr;
+//	if (j == 3)
+//	{
+//		//  字符串      a       b        c
+//		//	ASCII      97      98       99
+//		//	8bit   01100001 01100010 01100011
+//		//	6bit   011000   010110   001001   100011
+//		//	十进制      24      22        9        35
+//		//	对应编码    Y        W        J        j
+//		num[0] = DecodeTable[(int)byte[0]];
+//		num[1] = DecodeTable[(int)byte[1]];
+//		num[2] = DecodeTable[(int)byte[2]];
+//		num[3] = DecodeTable[(int)byte[3]];
+//		out[0] = (char)((num[0] << 2) + (num[1] >> 4));
+//		out[1] = (char)((num[1] << 4) + (num[2] >> 2));
+//		out[2] = (char)((num[2] << 6) + num[3]);
+//		result.AppendChar(out[0]);
+//		if (byte[2] != '=')
+//		{
+//			result.AppendChar(out[1]);
+//			if (byte[3] != '=')
+//				result.AppendChar(out[2]);
+//		}
+//		//j = 0;
+//	}
+//	
+//}
