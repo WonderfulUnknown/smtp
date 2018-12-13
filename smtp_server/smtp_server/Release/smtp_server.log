@@ -1,10 +1,13 @@
 ﻿  stdafx.cpp
-  mailsocket.cpp
-c:\users\user\documents\visual studio 2015\projects\计算机网络\smtp_server\smtp_server\base.h(39): warning C4244: “初始化”: 从“wchar_t”转换到“char”，可能丢失数据
+  MySocket.cpp
+c:\users\user\documents\visual studio 2015\projects\computer network\smtp\smtp_server\smtp_server\base.h(44): warning C4244: “=”: 从“wchar_t”转换到“char”，可能丢失数据
+c:\users\user\documents\visual studio 2015\projects\computer network\smtp\smtp_server\smtp_server\base64.h(35): warning C4244: “=”: 从“wchar_t”转换到“char”，可能丢失数据
   smtp_server.cpp
   smtp_serverDlg.cpp
   正在生成代码
-  All 238 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  1246 of 1249 functions (99.8%) were compiled, the rest were copied from previous compilation.
+    1050 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
   已完成代码的生成
-  smtp_server.vcxproj -> C:\Users\user\Documents\Visual Studio 2015\Projects\计算机网络\smtp_server\Release\smtp_server.exe
-  smtp_server.vcxproj -> C:\Users\user\Documents\Visual Studio 2015\Projects\计算机网络\smtp_server\Release\smtp_server.pdb (Full PDB)
+  smtp_server.vcxproj -> C:\Users\user\Documents\Visual Studio 2015\Projects\computer network\smtp\smtp_server\Release\smtp_server.exe
+  smtp_server.vcxproj -> C:\Users\user\Documents\Visual Studio 2015\Projects\computer network\smtp\smtp_server\Release\smtp_server.pdb (Full PDB)

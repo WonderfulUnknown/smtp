@@ -126,9 +126,7 @@ BOOL Csmtp_serverDlg::OnInitDialog()
 		}
 		//接受请求后，触发FD_ACCEPT事件，调用OnAccpet函数
 		else
-		{
 			m_log.SetWindowText(L"SMTP服务器准备就绪\r\n");
-		}
 	}
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -189,13 +187,12 @@ void Csmtp_serverDlg::OnBnClickedShowpicture()
 	// TODO: 在此添加控件通知处理程序代码
 	CString strFilePath = _T("1.bmp");
 	if (strFilePath == _T(""))
-	{
 		return;
-	}
+
 	CImage image;
 	image.Load(strFilePath);
-	CRect rectControl;                        //控件矩形对象
-	CRect rectPicture;                        //图片矩形对象
+	CRect rectControl;//控件矩形对象
+	CRect rectPicture;//图片矩形对象
 	int x = image.GetWidth();
 	int y = image.GetHeight();
 	CWnd  *pWnd = GetDlgItem(IDC_Picture);
@@ -205,7 +202,7 @@ void Csmtp_serverDlg::OnBnClickedShowpicture()
 	rectPicture = CRect(rectControl.TopLeft(), CSize((int)rectControl.Width(), (int)rectControl.Height()));
 	((CStatic*)GetDlgItem(IDC_Picture))->SetBitmap(NULL);
 
-	image.Draw(pDc->m_hDC, rectPicture);                //将图片绘制到Picture控件表示的矩形区域
+	image.Draw(pDc->m_hDC, rectPicture);//将图片绘制到Picture控件表示的矩形区域
 	image.Destroy();
 	pWnd->ReleaseDC(pDc);
 }

@@ -55,7 +55,12 @@ CString Decode_base64(CString str)
 					num[1] = DecodeTable[(int)byte[1]];
 					num[2] = DecodeTable[(int)byte[2]];
 					num[3] = DecodeTable[(int)byte[3]];
-
+					//  字符串      a       b        c
+					//	ASCII      97      98       99
+					//	8bit   01100001 01100010 01100011
+					//	6bit   011000   010110   001001   100011
+					//	十进制      24      22        9        35
+					//	对应编码    Y        W        J        j
 					out[0] = (char)((num[0] << 2) + (num[1] >> 4));
 					out[1] = (char)((num[1] << 4) + (num[2] >> 2));
 					out[2] = (char)((num[2] << 6) + num[3]);
@@ -86,12 +91,6 @@ CString Decode_base64(CString str)
 //	byte[j] = curr;
 //	if (j == 3)
 //	{
-//		//  字符串      a       b        c
-//		//	ASCII      97      98       99
-//		//	8bit   01100001 01100010 01100011
-//		//	6bit   011000   010110   001001   100011
-//		//	十进制      24      22        9        35
-//		//	对应编码    Y        W        J        j
 //		num[0] = DecodeTable[(int)byte[0]];
 //		num[1] = DecodeTable[(int)byte[1]];
 //		num[2] = DecodeTable[(int)byte[2]];

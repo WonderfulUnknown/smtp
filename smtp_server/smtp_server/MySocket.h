@@ -25,5 +25,3 @@ public:
 	bool IsError;//ÅĞ¶ÏÃüÁîÊÇ·ñÓĞ´í
 };
 
-void DrawPicture(CString picture);
-

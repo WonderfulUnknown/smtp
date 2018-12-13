@@ -219,19 +219,16 @@ void MySocket::OnReceive(int nErrorCode)
 				if (content.Find(L"Content-Disposition: attachment"))
 				{
 					int begin = content.Find(L"filename=");
-					begin = content.Find('.', begin);
-					begin = content.Find('"', begin) + 1;
+					if (begin != -1)
+					{
+						begin = content.Find('.', begin);
+						begin = content.Find('"', begin) + 1;
 
-					CString Picture;
+						CString Picture;
 
-					Picture = content.Mid(begin);
-					Decode_base64(Picture);
-
-					HBITMAP bmp;
-					bmp = (HBITMAP)::LoadImage(NULL, L"1.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-					Csmtp_serverDlg *CurrentApp = (Csmtp_serverDlg *)AfxGetApp();
-					Csmtp_serverDlg *CurrentDlg = (Csmtp_serverDlg *)CurrentApp->m_hWnd;
-					CurrentDlg->m_picture.SetBitmap(bmp);
+						Picture = content.Mid(begin);
+						Decode_base64(Picture);
+					}
 				}
 			}
 			AsyncSelect(FD_READ);
